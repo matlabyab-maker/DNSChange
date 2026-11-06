@@ -23,17 +23,38 @@ jobs:
           distribution: temurin
           java-version: "17"
 
-      # Install only the SDK command-line tools here. Package installation
-      # is done explicitly below so sdkmanager receives separate arguments.
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      # GitHub-hosted Ubuntu runners already include Android SDK.
+      # Avoid setup-android@v3 because its default package list can request
+      # the removed "tools" package and fail before the build starts.
+      - name: Configure preinstalled Android SDK
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDK_ROOT="${ANDROID_HOME:-/usr/local/lib/android/sdk}"
+          if [ ! -x "$SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" ]; then
+            echo "sdkmanager not found under $SDK_ROOT/cmdline-tools/latest" >&2
+            find "$SDK_ROOT/cmdline-tools" -maxdepth 3 -type f -name sdkmanager -print || true
+            exit 1
+          fi
+          echo "ANDROID_HOME=$SDK_ROOT" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK_ROOT" >> "$GITHUB_ENV"
+          echo "$SDK_ROOT/platform-tools" >> "$GITHUB_PATH"
+          echo "$SDK_ROOT/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
 
       - name: Accept Android SDK licenses
-        run: yes | sdkmanager --licenses
-
-      - name: Install Android SDK packages
+        shell: bash
         run: |
-          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          set -euo pipefail
+          yes | sdkmanager --sdk_root="$ANDROID_HOME" --licenses || true
+
+      - name: Install required Android SDK packages
+        shell: bash
+        run: |
+          set -euo pipefail
+          sdkmanager --sdk_root="$ANDROID_HOME" \
+            "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;35.0.0"
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
