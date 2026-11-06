@@ -19,3 +19,6 @@ GitHub Actions builds the debug APK on every branch push and uploads it as `DNSC
 - Alibaba Cloud public DNS: 223.5.5.5 / 223.6.6.6
 - CIRA Canadian Shield: 149.112.121.10 / 149.112.122.10 (and protected/family variants)
 - FDN France: 80.67.169.12 / 80.67.169.40
+
+## Build fix (2026-11-06)
+Fixed Kotlin compilation errors in `MainActivity.kt`: view constructors inside the panel receiver now use the Activity context explicitly, the country-title helper adds its view to the correct panel, and the EditText single-line setting uses `setSingleLine(true)`. The Android SDK workflow and VPN service were not changed for this fix.

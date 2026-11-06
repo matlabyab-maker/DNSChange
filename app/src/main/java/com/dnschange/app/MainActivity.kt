@@ -75,7 +75,7 @@ class MainActivity : Activity() {
         panel("تنظیم و فعال‌سازی DNS") {
             dns1 = edit("DNS 1 — آدرس اول")
             dns2 = edit("DNS 2 — آدرس دوم")
-            val activate = Button(this).apply {
+            val activate = Button(this@MainActivity).apply {
                 text="فعال‌سازی DNS"
                 textSize=20f
                 minHeight=64
@@ -83,26 +83,26 @@ class MainActivity : Activity() {
                 setOnClickListener { save(); activateVpn() }
             }
             addView(activate, LinearLayout.LayoutParams(-1, dp(68)).apply { topMargin=dp(8) })
-            val stop = Button(this).apply { text="قطع اتصال DNS"; isAllCaps=false; setOnClickListener { stopService(Intent(this@MainActivity,DnsVpnService::class.java)); status.text="وضعیت: خاموش" } }
+            val stop = Button(this@MainActivity).apply { text="قطع اتصال DNS"; isAllCaps=false; setOnClickListener { stopService(Intent(this@MainActivity,DnsVpnService::class.java)); status.text="وضعیت: خاموش" } }
             addView(stop)
             status = TextView(this@MainActivity).apply { text="وضعیت: خاموش"; textSize=15f; setPadding(4,12,4,4) }
             addView(status)
         }
 
         panel("انتخاب کشور — ابتدا DNS 1 یا DNS 2 را انتخاب کن") {
-            val choose = RadioGroup(this).apply { orientation=RadioGroup.HORIZONTAL }
-            val r1 = RadioButton(this).apply { text="انتخاب DNS 1"; id=1; isChecked=true }
-            val r2 = RadioButton(this).apply { text="انتخاب DNS 2"; id=2 }
+            val choose = RadioGroup(this@MainActivity).apply { orientation=RadioGroup.HORIZONTAL }
+            val r1 = RadioButton(this@MainActivity).apply { text="انتخاب DNS 1"; id=1; isChecked=true }
+            val r2 = RadioButton(this@MainActivity).apply { text="انتخاب DNS 2"; id=2 }
             choose.addView(r1); choose.addView(r2)
             choose.setOnCheckedChangeListener { _, id -> targetField = if(id==2) 2 else 1 }
             addView(choose)
             countries.forEach { (country, list) ->
-                addText(country, 18f, true)
-                val listBox = LinearLayout(this).apply { orientation=LinearLayout.VERTICAL }
+                addText(this, country, 18f, true)
+                val listBox = LinearLayout(this@MainActivity).apply { orientation=LinearLayout.VERTICAL }
                 list.forEach { resolver -> listBox.addView(resolverRow(resolver)) }
-                val inner = ScrollView(this).apply { addView(listBox); layoutParams=LinearLayout.LayoutParams(-1,dp(160)) }
+                val inner = ScrollView(this@MainActivity).apply { addView(listBox); layoutParams=LinearLayout.LayoutParams(-1,dp(160)) }
                 addView(inner)
-                addView(Button(this).apply {
+                addView(Button(this@MainActivity).apply {
                     text="به‌روزرسانی آنلاین فهرست $country"
                     isAllCaps=false
                     setOnClickListener { Toast.makeText(this@MainActivity,"فهرست اولیه در برنامه ذخیره است؛ دریافت کاتالوگ آنلاین در نسخه بعدی اضافه می‌شود.",Toast.LENGTH_LONG).show() }
@@ -110,15 +110,15 @@ class MainActivity : Activity() {
             }
         }
         panel("DNSهای عمومی") {
-            val box = LinearLayout(this).apply { orientation=LinearLayout.VERTICAL }
+            val box = LinearLayout(this@MainActivity).apply { orientation=LinearLayout.VERTICAL }
             publicDns.forEach { box.addView(resolverRow(it)) }
-            addView(ScrollView(this).apply { addView(box); layoutParams=LinearLayout.LayoutParams(-1,dp(230)) })
+            addView(ScrollView(this@MainActivity).apply { addView(box); layoutParams=LinearLayout.LayoutParams(-1,dp(230)) })
         }
         panel("مدیریت فهرست‌ها") {
-            addView(Button(this).apply { text="ذخیره DNSهای فعلی"; isAllCaps=false; setOnClickListener { save(); Toast.makeText(this@MainActivity,"DNSهای فعلی ذخیره شدند.",Toast.LENGTH_SHORT).show() } })
-            addView(Button(this).apply { text="ورود DNSهای ذخیره‌شده"; isAllCaps=false; setOnClickListener { restore(); Toast.makeText(this@MainActivity,"DNSهای ذخیره‌شده بارگذاری شدند.",Toast.LENGTH_SHORT).show() } })
-            addView(Button(this).apply { text="ذخیره فهرست پیش‌فرض کشورها"; isAllCaps=false; setOnClickListener { saveCatalog(); Toast.makeText(this@MainActivity,"فهرست‌های کشورها ذخیره شدند.",Toast.LENGTH_SHORT).show() } })
-            addView(Button(this).apply { text="ورود فهرست‌های ذخیره‌شده"; isAllCaps=false; setOnClickListener { loadCatalog(); Toast.makeText(this@MainActivity,"فهرست ذخیره‌شده بررسی شد.",Toast.LENGTH_SHORT).show() } })
+            addView(Button(this@MainActivity).apply { text="ذخیره DNSهای فعلی"; isAllCaps=false; setOnClickListener { save(); Toast.makeText(this@MainActivity,"DNSهای فعلی ذخیره شدند.",Toast.LENGTH_SHORT).show() } })
+            addView(Button(this@MainActivity).apply { text="ورود DNSهای ذخیره‌شده"; isAllCaps=false; setOnClickListener { restore(); Toast.makeText(this@MainActivity,"DNSهای ذخیره‌شده بارگذاری شدند.",Toast.LENGTH_SHORT).show() } })
+            addView(Button(this@MainActivity).apply { text="ذخیره فهرست پیش‌فرض کشورها"; isAllCaps=false; setOnClickListener { saveCatalog(); Toast.makeText(this@MainActivity,"فهرست‌های کشورها ذخیره شدند.",Toast.LENGTH_SHORT).show() } })
+            addView(Button(this@MainActivity).apply { text="ورود فهرست‌های ذخیره‌شده"; isAllCaps=false; setOnClickListener { loadCatalog(); Toast.makeText(this@MainActivity,"فهرست ذخیره‌شده بررسی شد.",Toast.LENGTH_SHORT).show() } })
         }
         root.addView(TextView(this).apply { text="نکته: فهرست کشورها بر اساس ارائه‌دهنده‌های شناخته‌شده تنظیم شده است. برخی DNSها Anycast هستند و الزاماً فقط در کشور نام‌برده میزبانی نمی‌شوند."; textSize=12f; setTextColor(0xFF555F70.toInt()); setPadding(6,12,6,0) })
     }
@@ -129,8 +129,14 @@ class MainActivity : Activity() {
         card.body()
         root.addView(card, LinearLayout.LayoutParams(-1,-2).apply { bottomMargin=dp(14) })
     }
-    private fun edit(hintText:String) = EditText(this).apply { hint=hintText; singleLine=true; textSize=16f; setPadding(dp(10),dp(8),dp(10),dp(8)); inputType=android.text.InputType.TYPE_CLASS_TEXT }
-    private fun addText(t:String, size:Float, bold:Boolean) { addView(TextView(this).apply { text=t; textSize=size; setTextColor(0xFF24364D.toInt()); if(bold) setTypeface(null,1); setPadding(0,dp(10),0,dp(5)) }) }
+    private fun edit(hintText:String) = EditText(this).apply { hint=hintText; setSingleLine(true); textSize=16f; setPadding(dp(10),dp(8),dp(10),dp(8)); inputType=android.text.InputType.TYPE_CLASS_TEXT }
+    private fun addText(parent: LinearLayout, t:String, size:Float, bold:Boolean) {
+        parent.addView(TextView(this@MainActivity).apply {
+            text=t; textSize=size; setTextColor(0xFF24364D.toInt())
+            if(bold) setTypeface(null,1)
+            setPadding(0,dp(10),0,dp(5))
+        })
+    }
     private fun resolverRow(r:Resolver): View {
         val row = LinearLayout(this).apply { orientation=LinearLayout.VERTICAL; setPadding(dp(8),dp(6),dp(8),dp(6)); setBackgroundColor(0xFFF0F4F9.toInt()) }
         row.addView(TextView(this).apply { text=r.name; textSize=15f; setTypeface(null,1); setTextColor(0xFF1C2B40.toInt()) })
